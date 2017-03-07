@@ -16,7 +16,6 @@ exports.getPublicUserPhotos = function(api_config, callback){
       method: 'GET',
       accept: 'application/json'
     };
-    console.log('about to query: ' + request_options.host);
 
     var req = https.request(request_options, function(response) {
         response.setEncoding('utf8');
