@@ -1,13 +1,14 @@
 var https = require('https');
 var qs = require('querystring');
 
-exports.getPublicUserPhotos = function(api_config, callback){
+exports.getPublicUserPhotos = function(api_config, page, callback){
   try{
     //set customizable method
     var api_method = 'flickr.people.getPublicPhotos';
     api_config.query_params.method = api_method;
     api_config.query_params.user_id = api_config.user_id;
     api_config.query_params.api_key = api_config.api_key;
+    api_config.query_params.page = page;
 
     var request_options = {
       host: api_config.host,

@@ -10,4 +10,8 @@
  var options = {};
  options.server_url = "http://localhost:3000";
 
- angular.module('flickr-app', ['PhotoViewerCtrl']);
+ angular.module('flickr-app',
+ [
+ 'PhotoViewerCtrl',
+ 'dc.endlessScroll'
+ ]);
