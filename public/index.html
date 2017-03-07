@@ -33,7 +33,7 @@
 </head>
 
 <body>
-    <div class="container-fluid" ng-app="flickr-app">
+    <div class="container-fluid" ng-app="flickr-app" ng-controller="PhotoViewerController">
         <nav class="navbar navbar-inverse">
           <div class="container-fluid">
             <div class="navbar-header">
@@ -58,21 +58,17 @@
                         <i class="glyphicon glyphicon-search"></i>
                       </button>
                     </div>
+                    <div>
+                      <button class="btn btn-default" type="btn-primary" ng-click="randomize()">Randomize!</button>
+                    </div>
                   </div>
                 </form>
-              </ul>
-              <ul class="nav navbar-nav navbar-right">
-                <!--
-                <li><a href="#"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
-                <li><a href="#"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
-              -->
               </ul>
             </div>
           </div>
         </nav>
-
-        <section id="collage" ng-controller="PhotoViewerController">
-            <div endless-scroll='photo in items | filter: search' class="row">
+        <section id="collage" >
+            <div ng-repeat='photo in items | filter: search' class="row">
               <a href="{{getPhotoSourceObject(photo).urlLarge}}">
                 <img data-toggle="tooltip" title={{photo.title}} ng-src="{{getPhotoSourceObject(photo).urlDefault}}" />
               </a>

@@ -7,15 +7,47 @@ angular.module('PhotoViewerCtrl',[])
     //$scope.photos = photos;
 
     // initialize on page 1 and get pagination details.
-    $http.get(options.server_url + '/api/photos?pageNum=1')
+    var initialize = function(){
+      $http.get(options.server_url + '/api/photos?pageNum=1')
       .then(function(data, status, headers){
         $scope.pagination = {
           current_page: data['data']['photos']['page'],
           total_pages: data['data']['photos']['pages']
         };
+
         //set up first items
         $scope.items = data['data']['photos']['photo'];
+
+        $scope.allItems = [];
+
+        //go get all image data lazily
+        for (var i = $scope.pagination.current_page; i <= $scope.pagination.total_pages; i++){
+          $http.get(options.server_url + '/api/photos?pageNum=' + i)
+            .then(function(data, status, headers){
+              var newPhotos = data['data']['photos']['photo'];
+              $scope.allItems = $scope.allItems.concat(newPhotos);
+            });
+        }
       });
+    }();//self invoke
+
+    $scope.randomize = function(){
+      $scope.items = [];
+      var newPage = randomIntFromInterval(1, $scope.pagination.total_pages);
+      $http.get(options.server_url + '/api/photos?pageNum=' + newPage)
+        .then(function(data, status, headers){
+          $scope.pagination = {
+            current_page: data['data']['photos']['page'],
+            total_pages: data['data']['photos']['pages']
+          };
+          $scope.items = data['data']['photos']['photo'];
+        });
+    }
+
+    function randomIntFromInterval(min,max)
+    {
+        return Math.floor(Math.random()*(max-min+1)+min);
+    }
 
     // Define a method to load a page of data
     var load = function(page) {
@@ -48,8 +80,8 @@ angular.module('PhotoViewerCtrl',[])
             $scope.loading = false;
           })
       }
-
     }
+
 
     // Register event handler
     $scope.$on('endlessScroll:next', function() {
