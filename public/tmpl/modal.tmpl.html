@@ -1,0 +1,19 @@
+<div id="{{handler}}" class="modal fade">
+    <div class="modal-dialog" style="height:auto;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">{{header}}</h4>
+            </div>
+
+            <div class="modal-body">
+              <a ng-href={{imageurl}}><img ng-src={{image}} /></a>
+            </div>
+
+            <div class="modal-footer">
+                <pre class='infobox' ng-bind-html='body'></pre>
+                <p class="text-right">{{footer}}</p>
+            </div>
+        </div>
+    </div>
+</div>
