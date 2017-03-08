@@ -65,14 +65,14 @@
                         <span class="caret"></span>
                       </button>
                       <ul class="dropdown-menu" aria-labelledby="sortMenu" ng-disabled="loading">
-                        <li ng-click="setSort('-views')">Most Viewed/li>
-                        <li ng-click="setSort('views')">Least Viewed</li>
-                        <li ng-click="setSort('-datetaken')">Image Taken: Newest</li>
-                        <li ng-click="setSort('datetaken')">Image Taken: Oldest</li>
-                        <li ng-click="setSort('-dateupload')">Uploaded: Most Recent/li>
-                        <li ng-click="setSort('dateupload')">Uploaded: Oldest</li>
+                        <li ng-click="setSort('-views')"><a href="javascript:void(0);">Most Viewed</a></li>
+                        <li ng-click="setSort('views')"><a href="javascript:void(0);">Least Viewed</a></li>
+                        <li ng-click="setSort('-datetaken')"><a href="javascript:void(0);">Image Taken: Newest</a></li>
+                        <li ng-click="setSort('datetaken')"><a href="javascript:void(0);">Image Taken: Oldest</a></li>
+                        <li ng-click="setSort('-dateupload')"><a href="javascript:void(0);">Uploaded: Most Recent</a></li>
+                        <li ng-click="setSort('dateupload')"><a href="javascript:void(0);">Uploaded: Oldest</a></li>
                         <li role="separator" class="divider"></li>
-                        <li ng-click="setSort('')">Clear Sort</li>
+                        <li ng-click="setSort('')"><a href="javascript:void(0);">Clear Sort</a></li>
                       </ul>
                     </div>
                   </div>
