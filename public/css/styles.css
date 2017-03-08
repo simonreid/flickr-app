@@ -45,6 +45,22 @@
   }
 }
 
+.img-responsive-height
+{
+  display: block;
+  width: auto;
+  max-height: 100%
+}
+
+.infobox {
+    white-space: pre-wrap;
+    white-space: -moz-pre-wrap;
+    white-space: -pre-wrap;
+    white-space: -o-pre-wrap;
+    word-break: break-word;
+    text-align: left;
+}
+
 body {
   margin: 0;
   padding: 0;

@@ -10,13 +10,9 @@
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="bower_components/jquery/dist/jquery.min.js"></script>
     <script src="bower_components/angular/angular.min.js"></script>
-
     <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
-
-
-    <!--<script src="js/ui-bootstrap/ui-bootstrap-tpls-2.5.0.min.js"></script>-->
-
     <script src="bower_components/lodash/dist/lodash.min.js"></script>
+    <script src="bower_components/angular-sanitize/angular-sanitize.min.js"></script>
 
     <!--angular custom -->
     <script src="js/app.js"></script>
@@ -82,15 +78,20 @@
           </div>
         </nav>
         <img ng-show="loading" ng-src="img/ajax-loader.gif" />
-        <section id="collage" >
+
+        <section id="collage" ng-controller="modalController">
+          <modal lolo="imgModal" modal-body='modalData.body' modal-image='modalData.image' modal-orig='modalData.imageurl' 
+          modal-footer='modalData.footer' modal-header='modalData.header' data-ng-click="myRightButton()"></modal>
           <div ng-repeat='photo in items | filter: searchText | limitTo: 100 | orderBy: sorter' class="row">
-            <a href="{{getPhotoSourceObject(photo).urlLarge}}">
+            <a ng-click="openPhoto(photo)" data-toggle="modal" href="#{{imgModal}}">
+              <!-- url to large size: {{getPhotoSourceObject(photo).urlLarge}} -->
               <img data-toggle="tooltip" title={{photo.title}} ng-src="{{getPhotoSourceObject(photo).urlSmall}}" />
             </a>
           </div>
 
           <div ng-show="searchText['$'].length > 0" ng-repeat="photo in moreItems | filter: searchText | limitTo: 100 | orderBy: sorter" class="row">
-            <a href="{{getPhotoSourceObject(photo).urlLarge}}">
+            <a ng-click="openPhoto(photo)" data-toggle="modal" href="#{{imgModal}}">
+              <!-- url to large size: {{getPhotoSourceObject(photo).urlLarge}} -->
               <img data-toggle="tooltip" title={{photo.title}} ng-src="{{getPhotoSourceObject(photo).urlSmall}}" />
             </a>
           </div>

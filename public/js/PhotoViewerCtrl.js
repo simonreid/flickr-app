@@ -51,6 +51,9 @@ angular.module('PhotoViewerCtrl',[])
     //set up variable to track sort value
     $scope.sorter = '';
 
+    //variable to track modal image data-toggle
+    $scope.modalData = {};
+
     var cancelAll = function() {
       pendingRequests.cancelAll();
     }
@@ -81,6 +84,7 @@ angular.module('PhotoViewerCtrl',[])
       $scope.items = data['data']['photos']['photo'];
       $scope.loading = false;
 
+      //do additional xhr for additional items beyond page 1
       getMoreItems(1);
 
     });
@@ -143,8 +147,15 @@ angular.module('PhotoViewerCtrl',[])
         })
     }
 
-
-
+    $scope.openPhoto = function(photo){
+      $scope.modalData = {
+        header: photo.title,
+        body: photo.description._content,
+        footer: "Views: " + photo.views,
+        image: $scope.getPhotoSourceObject(photo).urlLarge,
+        imageurl: $scope.getPhotoSourceObject(photo).urlOriginal
+      }
+    }
 
     // Register event handler in case we ever need endless scroll
     $scope.$on('scroll:next', function() {
@@ -157,7 +168,8 @@ angular.module('PhotoViewerCtrl',[])
       return {
         urlSquare: PhotoURLService.getSquare(imageObj),
         urlSmall: PhotoURLService.getSmall(imageObj),
-        urlLarge:  PhotoURLService.getLarge(imageObj)
+        urlLarge:  PhotoURLService.getLarge(imageObj),
+        urlOriginal:  PhotoURLService.getOriginal(imageObj)
       }
     }
   }
@@ -174,9 +186,13 @@ angular.module('PhotoViewerCtrl',[])
   //(500px)   urlDefault = https://farm4.staticflickr.com/3803/11738172576_37d0aeb353.jpg
   //(1024px)  urlLarge = https://farm4.staticflickr.com/3803/11738172576_37d0aeb353_b.jpg
 
+  //todo: create default image in a 'fallback' scenario for when one variant does't exist
   return {
+      getOriginal: function(imageObj) {
+        if(imageObj.url_o){ return imageObj.url_o} else {  };
+      },
       getLarge: function(imageObj) {
-        if(imageObj.url_l){ return imageObj.url_o} else {  };
+        if(imageObj.url_l){ return imageObj.url_l} else {  };
       },
       getSmall: function(imageObj){
         if(imageObj.url_s){ return imageObj.url_s} else {  };
@@ -196,3 +212,34 @@ angular.module('PhotoViewerCtrl',[])
         }
     }
 })
+
+.controller('modalController', ['$scope', function ($scope) {
+    $scope.header = $scope.modalData.header;
+    $scope.modalBody = $scope.modalData.body;
+    $scope.footer = $scope.modalData.footer;
+    $scope.modalImage = $scope.modalData.image;
+    $scope.modalImageURL = $scope.modalData.imageurl;
+}])
+
+
+.directive('modal', function () {
+    return {
+        restrict: 'EA',
+        scope: {
+            title: '=modalTitle',
+            header: '=modalHeader',
+            body: '=modalBody',
+            footer: '=modalFooter',
+            image: '=modalImage',
+            imageurl: '=modalOrig',
+            callbackbuttonleft: '&ngClickLeftButton',
+            callbackbuttonright: '&ngClickRightButton',
+            handler: '=lolo'
+        },
+        templateUrl: 'tmpl/modal.tmpl.html',
+        transclude: true,
+        controller: function ($scope) {
+            $scope.handler = 'pop';
+        },
+    };
+});
