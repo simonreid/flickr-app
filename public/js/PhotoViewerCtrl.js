@@ -1,47 +1,124 @@
 angular.module('PhotoViewerCtrl',[])
 
-.controller('PhotoViewerController', ['$scope', '$http', 'PhotoService', 'PhotoURLService',
-  function PhotoViewerCtrl($scope, $http, PhotoService, PhotoURLService) {
+//lodash
+.constant('_', window._)
+
+.service('pendingRequests', function() {
+  var pending = [];
+  this.get = function() {
+    return pending;
+  };
+  this.add = function(request) {
+    pending.push(request);
+  };
+  this.remove = function(request) {
+    pending = _.filter(pending, function(p) {
+      return p.url !== request;
+    });
+  };
+  this.cancelAll = function() {
+    angular.forEach(pending, function(p) {
+      p.canceller.resolve();
+    });
+    pending.length = 0;
+  };
+})
+
+.service('httpService', ['$http', '$q', 'pendingRequests', function($http, $q, pendingRequests) {
+  this.get = function(url) {
+    var canceller = $q.defer();
+    pendingRequests.add({
+      url: url,
+      canceller: canceller
+    });
+    //Request gets cancelled if the timeout-promise is resolved
+    var requestPromise = $http.get(url, { timeout: canceller.promise });
+    //Once a request has failed or succeeded, remove it from the pending list
+    requestPromise.finally(function() {
+      pendingRequests.remove(url);
+    });
+    return requestPromise;
+  }
+}])
+
+.controller('PhotoViewerController', ['$scope', '$http', '$q', '_', 'PhotoService', 'PhotoURLService', 'httpService', 'pendingRequests',
+  function PhotoViewerCtrl($scope, $http, $q, _ , PhotoService, PhotoURLService, httpService, pendingRequests) {
 
     //expose photos to template:
     //$scope.photos = photos;
+    $scope.loading = true;
+
+    var cancelAll = function() {
+      pendingRequests.cancelAll();
+    }
 
     // initialize on page 1 and get pagination details.
-    var initialize = function(){
-      $http.get(options.server_url + '/api/photos?pageNum=1')
-      .then(function(data, status, headers){
-        $scope.pagination = {
-          current_page: data['data']['photos']['page'],
-          total_pages: data['data']['photos']['pages']
-        };
+    console.log(httpService);
+    httpService.get(options.server_url + '/api/photos?pageNum=1')
+    .then(function(data, status, headers){
+      $scope.pagination = {
+        current_page: data['data']['photos']['page'],
+        total_pages: data['data']['photos']['pages']
+      };
 
-        //set up first items
-        $scope.items = data['data']['photos']['photo'];
+      //set up first items
+      $scope.items = data['data']['photos']['photo'];
+      $scope.loading = false;
 
-        $scope.allItems = [];
+      getMoreItems(1);
+    });
 
-        //go get all image data lazily
-        for (var i = $scope.pagination.current_page; i <= $scope.pagination.total_pages; i++){
-          $http.get(options.server_url + '/api/photos?pageNum=' + i)
+    var getMoreItems = function(curPage){
+      $scope.moreItems = [];
+
+      if(curPage == 1){
+        //go get rest of image pages lazily
+        for (var i = 2; i <= $scope.pagination.total_pages; i++){
+          httpService.get(options.server_url + '/api/photos?pageNum=' + i)
             .then(function(data, status, headers){
               var newPhotos = data['data']['photos']['photo'];
-              $scope.allItems = $scope.allItems.concat(newPhotos);
+              $scope.moreItems = $scope.moreItems.concat(newPhotos);
             });
         }
-      });
-    }();//self invoke
+      } else {
+        //page is in the middle of a pack
+        //get remaining pages
+        for (var i = curPage + 1; i <= $scope.pagination.total_pages; i++){
+          httpService.get(options.server_url + '/api/photos?pageNum=' + i)
+            .then(function(data, status, headers){
+              var newPhotos = data['data']['photos']['photo'];
+              $scope.moreItems = $scope.moreItems.concat(newPhotos);
+            })
+        }
+        //go get first pages
+        for (var i = 1; i <= curPage; i++){
+          httpService.get(options.server_url + '/api/photos?pageNum=' + i)
+            .then(function(data, status, headers){
+              var newPhotos = data['data']['photos']['photo'];
+              $scope.moreItems = $scope.moreItems.concat(newPhotos);
+            });
+        }
+      }
+    }
 
+    //get random page of images
     $scope.randomize = function(){
+      $scope.loading = true;
+      cancelAll();
       $scope.items = [];
       var newPage = randomIntFromInterval(1, $scope.pagination.total_pages);
-      $http.get(options.server_url + '/api/photos?pageNum=' + newPage)
+      httpService.get(options.server_url + '/api/photos?pageNum=' + newPage)
         .then(function(data, status, headers){
           $scope.pagination = {
             current_page: data['data']['photos']['page'],
             total_pages: data['data']['photos']['pages']
           };
           $scope.items = data['data']['photos']['photo'];
-        });
+          $scope.loading = false;
+        })
+        .then(function(){
+          getMoreItems(newPage);
+        })
     }
 
     function randomIntFromInterval(min,max)
@@ -49,50 +126,18 @@ angular.module('PhotoViewerCtrl',[])
         return Math.floor(Math.random()*(max-min+1)+min);
     }
 
-    // Define a method to load a page of data
-    var load = function(page) {
-      var isTerminal = $scope.pagination &&
-                       $scope.pagination.current_page >= $scope.pagination.total_pages &&
-                       $scope.pagination.current_page <= 1;
 
-      console.log('terminal? ' + isTerminal);
-
-      // Determine if there is a need to load a new page
-      if (!isTerminal) {
-        // Flag loading as started
-        $scope.loading = true;
-
-        // Make an API request
-       $http.get(options.server_url + '/api/photos?pageNum=' + page)
-          .then(function(data, status, headers) {
-            console.log('got next page: ' + page)
-            // Parse pagination data from the response header
-            $scope.pagination.current_page = page;
-
-            // Create an array if not already created
-            $scope.items = $scope.items || [];
-
-            // Append new items (or prepend if loading previous pages)
-            $scope.items.push.apply($scope.items, data['data']['photos']['photo']);
-          })
-          .then(function() {
-            // Flag loading as complete
-            $scope.loading = false;
-          })
-      }
-    }
-
-
-    // Register event handler
-    $scope.$on('endlessScroll:next', function() {
+    // Register event handler in case we ever need endless scroll
+    $scope.$on('scroll:next', function() {
       //console.log('page: ' + $scope.pagination.current_page)
       // Load page
-      load($scope.pagination.current_page + 1);
+      //load($scope.pagination.current_page + 1);
     });
 
     $scope.getPhotoSourceObject = function(imageObj){
       return {
-        urlDefault: PhotoURLService.getDefault(imageObj),
+        urlSquare: PhotoURLService.getSquare(imageObj),
+        urlSmall: PhotoURLService.getSmall(imageObj),
         urlLarge:  PhotoURLService.getLarge(imageObj)
       }
     }
@@ -112,13 +157,18 @@ angular.module('PhotoViewerCtrl',[])
 
   return {
       getLarge: function(imageObj) {
-          return 'https://farm' + imageObj.farm + '.staticflickr.com/' + imageObj.server + '/' + imageObj.id + '_' + imageObj.secret + '_b.jpg';
+        if(imageObj.url_l){ return imageObj.url_o} else {  };
       },
-      getDefault: function(imageObj){
-          return 'https://farm' + imageObj.farm + '.staticflickr.com/' + imageObj.server + '/' + imageObj.id + '_' + imageObj.secret + '.jpg';
+      getSmall: function(imageObj){
+        if(imageObj.url_s){ return imageObj.url_s} else {  };
+      },
+      getSquare: function(imageObj){
+        if(imageObj.url_sq){ return imageObj.url_sq} else { };
       }
   }
 })
+
+
 
 .factory('PhotoService', function ($http) {
     return {
