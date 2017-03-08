@@ -52,7 +52,7 @@
                 <li><a href="#">Page 1</a></li>-->
                 <form class="navbar-form navbar-left">
                   <div class="input-group">
-                    <input class="form-control" type="text" placeholder="Search" ng-model="searchText.$" ng-model-options="{ debounce: 200 }">
+                    <input class="form-control" type="text" placeholder="Search" ng-disabled="loading" ng-model="searchText.$" ng-model-options="{ debounce: 500 }" >
                   </div>
                   <div class="input-group">
                     <button class="btn btn-default" type="btn-primary" ng-click="randomize()">Randomize</button>
@@ -64,13 +64,13 @@
         </nav>
         <p ng-show="loading">Loading...</p>
         <section id="collage" >
-          <div ng-repeat='photo in items | filter: searchText' class="row">
+          <div ng-repeat='photo in items | filter: searchText | limitTo: 100' class="row">
             <a href="{{getPhotoSourceObject(photo).urlLarge}}">
               <img data-toggle="tooltip" title={{photo.title}} ng-src="{{getPhotoSourceObject(photo).urlSmall}}" />
             </a>
           </div>
 
-          <div ng-show="searchText['$'].length > 0" ng-repeat="photo in moreItems | filter: searchText" class="row">
+          <div ng-show="searchText['$'].length > 0" ng-repeat="photo in moreItems | filter: searchText | limitTo: 100" class="row">
             <a href="{{getPhotoSourceObject(photo).urlLarge}}">
               <img data-toggle="tooltip" title={{photo.title}} ng-src="{{getPhotoSourceObject(photo).urlSmall}}" />
             </a>

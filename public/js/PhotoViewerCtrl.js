@@ -52,6 +52,15 @@ angular.module('PhotoViewerCtrl',[])
       pendingRequests.cancelAll();
     }
 
+    /*
+    $scope.textChanged = function() {
+      console.log('got here')
+        if ($scope.searchText['$'].length > 0) {
+          getMoreItems()
+        } else { return };
+    };
+    */
+
     // initialize on page 1 and get pagination details.
     console.log(httpService);
     httpService.get(options.server_url + '/api/photos?pageNum=1')
@@ -66,6 +75,7 @@ angular.module('PhotoViewerCtrl',[])
       $scope.loading = false;
 
       getMoreItems(1);
+
     });
 
     var getMoreItems = function(curPage){
@@ -101,6 +111,11 @@ angular.module('PhotoViewerCtrl',[])
       }
     }
 
+    function randomIntFromInterval(min,max)
+    {
+        return Math.floor(Math.random()*(max-min+1)+min);
+    }
+
     //get random page of images
     $scope.randomize = function(){
       $scope.loading = true;
@@ -121,10 +136,7 @@ angular.module('PhotoViewerCtrl',[])
         })
     }
 
-    function randomIntFromInterval(min,max)
-    {
-        return Math.floor(Math.random()*(max-min+1)+min);
-    }
+
 
 
     // Register event handler in case we ever need endless scroll
