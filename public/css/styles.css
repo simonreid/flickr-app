@@ -51,6 +51,11 @@
   max-height: 100%
 }
 
+.image-container{
+  position: relative;
+  display: block;
+}
+
 .infobox {
     white-space: pre-wrap;
     white-space: -moz-pre-wrap;

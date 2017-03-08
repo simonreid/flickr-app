@@ -87,13 +87,13 @@
         <section id="collage" ng-controller="modalController" ng-cloak>
           <modal lolo="imgModal" modal-body='modalData.body' modal-image='modalData.image' modal-orig='modalData.imageurl'
           modal-date-taken='modalData.dateTaken' modal-views='modalData.views' modal-header='modalData.header' data-ng-click="myRightButton()"></modal>
-          <div ng-repeat='photo in items | filter: searchText | limitTo: 100 | orderBy: sorter' class="row">
+          <div class='image-container' ng-repeat='photo in items | filter: searchText | limitTo: 100 | orderBy: sorter' class="row">
             <a ng-click="openPhoto(photo)" data-toggle="modal" href="#{{imgModal}}">
               <img data-toggle="tooltip" title={{photo.title}} ng-src="{{getPhotoSourceObject(photo).urlSmall}}" />
             </a>
           </div>
 
-          <div ng-show="searchText['$'].length > 0" ng-repeat="photo in moreItems | filter: searchText | limitTo: 100 | orderBy: sorter" class="row">
+          <div class='image-container' ng-show="searchText['$'].length > 0" ng-repeat="photo in moreItems | filter: searchText | limitTo: 100 | orderBy: sorter" class="row">
             <a ng-click="openPhoto(photo)" data-toggle="modal" href="#{{imgModal}}">
               <img data-toggle="tooltip" title={{photo.title}} ng-src="{{getPhotoSourceObject(photo).urlSmall}}" />
             </a>
