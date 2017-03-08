@@ -3,10 +3,8 @@
 flickr-app is a project designed to retrieve and display images using the flickr api.
 This project is currently configured to get NASA images, but could easily be extended to retrieve and browse multiple users' photos.
 
+It uses a NodeJS back-end with express routing, and an AngularJS front-end to enable users to browse NASA's public photos and obtain information about the photos as well as obtain an original-size image of the photo.  After all- Hubble pictures deserve high resolution!
 
-## Prerequisites
-
-You'll need access to the project on github: https://github.com/simonreid/flickr-app.git
 
 ## 1. Clone the app
 
@@ -38,3 +36,10 @@ Alternatively you can use:
   ```
 
 View your app at: http://localhost:3000
+
+## 2. Basic server testing
+
+Perform testing, as defined in ./test/test.js, with mocha:
+  ```
+  npm test
+  ```
