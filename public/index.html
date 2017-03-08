@@ -13,6 +13,9 @@
 
     <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 
+
+    <!--<script src="js/ui-bootstrap/ui-bootstrap-tpls-2.5.0.min.js"></script>-->
+
     <script src="bower_components/lodash/dist/lodash.min.js"></script>
 
     <!--angular custom -->
@@ -21,7 +24,6 @@
     <script type="text/javascript" src="bower_components/angular-endless-scroll/dist/angular-endless-scroll.min.js"></script>
 
     <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css" />
-    <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 
     <link rel="stylesheet" href="css/styles.css" >
 
@@ -31,7 +33,6 @@
         $("body").tooltip({ selector: '[data-toggle=tooltip]' });
       });
     </script>
-
 </head>
 
 <body>
@@ -50,36 +51,50 @@
               <ul class="nav navbar-nav">
                 <!--<li class="active"><a href="#">Home</a></li>
                 <li><a href="#">Page 1</a></li>-->
-                <form class="navbar-form navbar-left">
+                <form class="navbar-form navbar-left" >
                   <div class="input-group">
                     <input class="form-control" type="text" placeholder="Search" ng-disabled="loading" ng-model="searchText.$" ng-model-options="{ debounce: 500 }" >
                   </div>
                   <div class="input-group">
-                    <button class="btn btn-default" type="btn-primary" ng-click="randomize()">Randomize</button>
+                    <button class="btn btn-default" type="btn-primary" ng-disabled="loading" ng-click="randomize()">Randomize</button>
+                  </div>
+                  <div class="input-group">
+                    <div dropdown>
+                      <button class="btn btn-default dropdown-toggle" type="button" id="sortMenu"
+                              ng-disabled="loading" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" >
+                        Sort
+                        <span class="caret"></span>
+                      </button>
+                      <ul class="dropdown-menu" aria-labelledby="sortMenu" ng-disabled="loading">
+                        <li ng-click="setSort('-views')"><a href="#">Most Viewed</a></li>
+                        <li ng-click="setSort('views')"><a href="#">Least Viewed</a></li>
+                        <li ng-click="setSort('-datetaken')"><a href="#">Image Taken: Newest</a></li>
+                        <li ng-click="setSort('datetaken')"><a href="#">Image Taken: Oldest</a></li>
+                        <li ng-click="setSort('-dateupload')"><a href="#">Uploaded: Most Recent</a></li>
+                        <li ng-click="setSort('dateupload')"><a href="#">Uploaded: Oldest</a></li>
+                      </ul>
+                    </div>
                   </div>
                 </form>
               </ul>
             </div>
           </div>
         </nav>
-        <p ng-show="loading">Loading...</p>
+        <img ng-show="loading" ng-src="img/ajax-loader.gif" />
         <section id="collage" >
-          <div ng-repeat='photo in items | filter: searchText | limitTo: 100' class="row">
+          <div ng-repeat='photo in items | filter: searchText | limitTo: 100 | orderBy: sorter' class="row">
             <a href="{{getPhotoSourceObject(photo).urlLarge}}">
               <img data-toggle="tooltip" title={{photo.title}} ng-src="{{getPhotoSourceObject(photo).urlSmall}}" />
             </a>
           </div>
 
-          <div ng-show="searchText['$'].length > 0" ng-repeat="photo in moreItems | filter: searchText | limitTo: 100" class="row">
+          <div ng-show="searchText['$'].length > 0" ng-repeat="photo in moreItems | filter: searchText | limitTo: 100 | orderBy: sorter" class="row">
             <a href="{{getPhotoSourceObject(photo).urlLarge}}">
               <img data-toggle="tooltip" title={{photo.title}} ng-src="{{getPhotoSourceObject(photo).urlSmall}}" />
             </a>
           </div>
 
         </section>
-
-
-
     </div>
 
 </body>

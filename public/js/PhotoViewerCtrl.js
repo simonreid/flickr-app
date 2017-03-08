@@ -48,8 +48,15 @@ angular.module('PhotoViewerCtrl',[])
     //$scope.photos = photos;
     $scope.loading = true;
 
+    //set up variable to track sort value
+    $scope.sorter = '';
+
     var cancelAll = function() {
       pendingRequests.cancelAll();
+    }
+
+    $scope.setSort = function(sortString) {
+      $scope.sorter = sortString;
     }
 
     /*
