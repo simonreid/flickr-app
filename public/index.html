@@ -81,7 +81,7 @@
         <img ng-show="loading" ng-src="img/ajax-loader.gif" />
 
         <!-- MAIN IMAGE COLLAGE AND MODAL -->
-        <section id="collage" ng-controller="modalController">
+        <section id="collage" ng-controller="modalController" ng-cloak>
           <modal lolo="imgModal" modal-body='modalData.body' modal-image='modalData.image' modal-orig='modalData.imageurl'
           modal-date-taken='modalData.dateTaken' modal-views='modalData.views' modal-header='modalData.header' data-ng-click="myRightButton()"></modal>
           <div ng-repeat='photo in items | filter: searchText | limitTo: 100 | orderBy: sorter' class="row">
