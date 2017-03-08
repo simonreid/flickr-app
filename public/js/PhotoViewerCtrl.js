@@ -143,7 +143,8 @@ angular.module('PhotoViewerCtrl',[])
       $scope.modalData = {
         header: photo.title,
         body: photo.description._content,
-        footer: "Views: " + photo.views,
+        dateTaken: (photo.datetaken ? photo.datetaken : "Unknown"),
+        views: photo.views,
         image: $scope.getPhotoSourceObject(photo).urlLarge,
         imageurl: $scope.getPhotoSourceObject(photo).urlOriginal
       }
@@ -181,19 +182,37 @@ angular.module('PhotoViewerCtrl',[])
   //(500px)   urlDefault = https://farm4.staticflickr.com/3803/11738172576_37d0aeb353.jpg
   //(1024px)  urlLarge = https://farm4.staticflickr.com/3803/11738172576_37d0aeb353_b.jpg
 
-  //todo: create default image in a 'fallback' scenario for when one variant does't exist
+  /*
+  s	small square 75x75
+  q	large square 150x150
+  t	thumbnail, 100 on longest side
+  m	small, 240 on longest side
+  n	small, 320 on longest side
+  -	medium, 500 on longest side
+  z	medium 640, 640 on longest side
+  c	medium 800, 800 on longest side†
+  b	large, 1024 on longest side*
+  h	large 1600, 1600 on longest side†
+  k	large 2048, 2048 on longest side†
+  o	original image, either a jpg, gif or png, depending on source format
+  */
+  //default "fallback" image is defined here
+  var defaultImage = function(imageObj){
+    return imageObj.url_n;
+  }
+
   return {
       getOriginal: function(imageObj) {
-        if(imageObj.url_o){ return imageObj.url_o} else {  };
+        if(imageObj.url_o){ return imageObj.url_o} else { return defaultImage(imageObj) };
       },
       getLarge: function(imageObj) {
-        if(imageObj.url_l){ return imageObj.url_l} else {  };
+        if(imageObj.url_l){ return imageObj.url_l} else { return defaultImage(imageObj) };
       },
       getSmall: function(imageObj){
-        if(imageObj.url_s){ return imageObj.url_s} else {  };
+        if(imageObj.url_s){ return imageObj.url_s} else { return defaultImage(imageObj) };
       },
       getSquare: function(imageObj){
-        if(imageObj.url_sq){ return imageObj.url_sq} else { };
+        if(imageObj.url_sq){ return imageObj.url_sq} else { return defaultImage(imageObj) };
       }
   }
 })
@@ -201,7 +220,8 @@ angular.module('PhotoViewerCtrl',[])
 .controller('modalController', ['$scope', function ($scope) {
     $scope.header = $scope.modalData.header;
     $scope.modalBody = $scope.modalData.body;
-    $scope.footer = $scope.modalData.footer;
+    $scope.dateTaken = $scope.modalData.dateTaken;
+    $scope.views = $scope.modalData.views;
     $scope.modalImage = $scope.modalData.image;
     $scope.modalImageURL = $scope.modalData.imageurl;
 }])
@@ -214,7 +234,8 @@ angular.module('PhotoViewerCtrl',[])
             title: '=modalTitle',
             header: '=modalHeader',
             body: '=modalBody',
-            footer: '=modalFooter',
+            dateTaken: '=modalDateTaken',
+            views: '=modalViews',
             image: '=modalImage',
             imageurl: '=modalOrig',
             callbackbuttonleft: '&ngClickLeftButton',
