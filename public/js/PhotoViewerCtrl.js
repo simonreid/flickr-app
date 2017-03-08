@@ -3,6 +3,8 @@ angular.module('PhotoViewerCtrl',[])
 //lodash
 .constant('_', window._)
 
+//service to track all pending xhr requests.
+//created in order to enable cancelation (really resolving all unresolved promises) of xhr.
 .service('pendingRequests', function() {
   var pending = [];
   this.get = function() {
@@ -24,6 +26,7 @@ angular.module('PhotoViewerCtrl',[])
   };
 })
 
+//http request wrapper to facilitate tracking of requests
 .service('httpService', ['$http', '$q', 'pendingRequests', function($http, $q, pendingRequests) {
   this.get = function(url) {
     var canceller = $q.defer();
@@ -31,9 +34,8 @@ angular.module('PhotoViewerCtrl',[])
       url: url,
       canceller: canceller
     });
-    //Request gets cancelled if the timeout-promise is resolved
     var requestPromise = $http.get(url, { timeout: canceller.promise });
-    //Once a request has failed or succeeded, remove it from the pending list
+    //remove from pending list if complete
     requestPromise.finally(function() {
       pendingRequests.remove(url);
     });
@@ -41,11 +43,9 @@ angular.module('PhotoViewerCtrl',[])
   }
 }])
 
-.controller('PhotoViewerController', ['$scope', '$http', '$q', '_', 'PhotoService', 'PhotoURLService', 'httpService', 'pendingRequests',
-  function PhotoViewerCtrl($scope, $http, $q, _ , PhotoService, PhotoURLService, httpService, pendingRequests) {
-
-    //expose photos to template:
-    //$scope.photos = photos;
+.controller('PhotoViewerController', ['$scope', '$http', '$q', '_', 'PhotoURLService', 'httpService', 'pendingRequests',
+  function PhotoViewerCtrl($scope, $http, $q, _ , PhotoURLService, httpService, pendingRequests) {
+    //controls spinner and enable/disable of search/sort functions
     $scope.loading = true;
 
     //set up variable to track sort value
@@ -62,17 +62,7 @@ angular.module('PhotoViewerCtrl',[])
       $scope.sorter = sortString;
     }
 
-    /*
-    $scope.textChanged = function() {
-      console.log('got here')
-        if ($scope.searchText['$'].length > 0) {
-          getMoreItems()
-        } else { return };
-    };
-    */
-
-    // initialize on page 1 and get pagination details.
-    console.log(httpService);
+    // initialize on page 1 and get pagination details, using get service
     httpService.get(options.server_url + '/api/photos?pageNum=1')
     .then(function(data, status, headers){
       $scope.pagination = {
@@ -86,9 +76,9 @@ angular.module('PhotoViewerCtrl',[])
 
       //do additional xhr for additional items beyond page 1
       getMoreItems(1);
-
     });
 
+    //get additional items if user is doing a search- facilitates getting complete results from all images
     var getMoreItems = function(curPage){
       $scope.moreItems = [];
 
@@ -122,6 +112,7 @@ angular.module('PhotoViewerCtrl',[])
       }
     }
 
+    //tool for getting random page number for randomize function
     function randomIntFromInterval(min,max)
     {
         return Math.floor(Math.random()*(max-min+1)+min);
@@ -147,6 +138,7 @@ angular.module('PhotoViewerCtrl',[])
         })
     }
 
+    //called when user opens a photo modal; assists with passing data into modal
     $scope.openPhoto = function(photo){
       $scope.modalData = {
         header: photo.title,
@@ -157,13 +149,16 @@ angular.module('PhotoViewerCtrl',[])
       }
     }
 
+    /* todo: implement infinite scroll
     // Register event handler in case we ever need endless scroll
     $scope.$on('scroll:next', function() {
       //console.log('page: ' + $scope.pagination.current_page)
       // Load page
       //load($scope.pagination.current_page + 1);
     });
+    */
 
+    //container for various source urls of a photo
     $scope.getPhotoSourceObject = function(imageObj){
       return {
         urlSquare: PhotoURLService.getSquare(imageObj),
@@ -203,16 +198,6 @@ angular.module('PhotoViewerCtrl',[])
   }
 })
 
-
-
-.factory('PhotoService', function ($http) {
-    return {
-        get: function() {
-            return $http.get(options.server_url + '/api/photos');
-        }
-    }
-})
-
 .controller('modalController', ['$scope', function ($scope) {
     $scope.header = $scope.modalData.header;
     $scope.modalBody = $scope.modalData.body;
@@ -221,7 +206,7 @@ angular.module('PhotoViewerCtrl',[])
     $scope.modalImageURL = $scope.modalData.imageurl;
 }])
 
-
+//custom directive for modal; uses template found in the /tmpl folder
 .directive('modal', function () {
     return {
         restrict: 'EA',

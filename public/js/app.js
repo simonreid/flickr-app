@@ -8,11 +8,11 @@
  * Main module of the application.
  */
  var options = {};
-//options.server_url = "http://flickr-app.mybluemix.net";
-options.server_url = "http://localhost:3000";
+options.server_url = "http://flickr-app.mybluemix.net";
+//options.server_url = "http://localhost:3000";
 
  angular.module('flickr-app',
  [
  'PhotoViewerCtrl',
- 'ngSanitize'
+ 'ngSanitize'//assists with sanitizing html text for display in dom
  ]);
