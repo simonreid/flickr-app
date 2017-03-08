@@ -8,20 +8,23 @@
     "node": "4.*"
   },
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "test": "mocha"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/IBM-Bluemix/get-started-node"
   },
   "dependencies": {
+    "assert": "^1.4.1",
     "body-parser": "^1.16.1",
     "cfenv": "^1.0.x",
     "cloudant": "^1.7.1",
     "dotenv": "^4.0.0",
     "express": "^4.14.1",
     "fs": "0.0.1-security",
-    "https": "^1.0.0"
+    "https": "^1.0.0",
+    "request": "^2.80.0"
   },
   "author": "IBM Corp",
   "license": "Apache-2.0"
