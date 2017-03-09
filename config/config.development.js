@@ -11,7 +11,8 @@ config.api_config = {
   query_params : {
     nojsoncallback: 1,
     format: 'json',
-  }
+  },
+  numPerPage: 250
 };
 
 //export
