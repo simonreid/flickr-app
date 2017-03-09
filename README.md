@@ -35,6 +35,12 @@ Alternatively you can use:
   node server.js
   ```
 
+If running locally, use these settings:
+  ```
+  ./config/config.global.js, config.offline = true;
+  ./public/js/app.js, options.server_url = "http://localhost:3000";
+  ```
+
 View your app at: http://localhost:3000
 
 ## 2. Basic server testing
