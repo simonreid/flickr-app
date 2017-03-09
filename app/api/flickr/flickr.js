@@ -9,7 +9,7 @@ exports.getPublicUserPhotos = function(api_config, page, callback){
     api_config.query_params.user_id = api_config.user_id;
     api_config.query_params.api_key = api_config.api_key;
     api_config.query_params.page = page;
-    api_config.query_params.per_page = 250;
+    api_config.query_params.per_page = api_config.numPerPage;
     api_config.query_params.extras = 'description, license, date_upload, \
     date_taken, owner_name, icon_server, original_format, last_update, geo, \
     tags, machine_tags, o_dims, views, media, path_alias, url_sq, url_t, \
